@@ -34,13 +34,20 @@ class HybridRetriever:
         self._embed = SentenceTransformer(CONFIG.embedding_model)
 
     def _dense_topn(self, query: str, n: int) -> list[tuple[int, float]]:
+        n = min(n, self._faiss.ntotal)
+        if n == 0:
+            return []
         q = self._embed.encode([query], convert_to_numpy=True, normalize_embeddings=True).astype(np.float32)
         scores, idxs = self._faiss.search(q, n)
-        return list(zip(idxs[0].tolist(), scores[0].tolist()))
+        # FAISS returns -1 for empty slots when k > ntotal; we already clamp above
+        return [(int(i), float(s)) for i, s in zip(idxs[0].tolist(), scores[0].tolist()) if i >= 0]
 
     def _bm25_topn(self, query: str, n: int) -> list[tuple[int, float]]:
         tokens = query.lower().split()
         scores = self._bm25.get_scores(tokens)
+        n = min(n, len(scores))
+        if n == 0:
+            return []
         top = np.argpartition(scores, -n)[-n:]
         top = top[np.argsort(-scores[top])]
         return [(int(i), float(scores[i])) for i in top]
