@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+
+# venv / env
+.venv/
+venv/
+.env
+
+# editor/AI tool artifacts
+.claude/
+.cursor/
+.aider*
+.continue/
+.github/copilot/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# project artifacts
+data/index/
+data/results.json
+dashboards/build/

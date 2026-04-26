@@ -1,0 +1,10 @@
+# Minimum acceptable scores for the CI gate. A PR that drops below any of these can't merge.
+# Tune these based on the size and difficulty of your golden set.
+
+recall@5: 0.70
+mrr@10: 0.55
+ctx_precision@5: 0.40
+faithfulness: 0.60
+refusal_correct: 0.80
+# hallucination_rate is a maximum, not a minimum.
+hallucination_rate: 0.10

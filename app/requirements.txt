@@ -1,0 +1,2 @@
+# For Hugging Face Spaces. Mirrors the [app] extra in pyproject.toml.
+-e .[app]

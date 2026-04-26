@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-evals"
+version = "0.1.0"
+description = "Production-shaped RAG with hybrid retrieval, reranking, structured outputs, and CI-gated eval loops."
+authors = [{ name = "Yashraj B." }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "anthropic>=0.39",
+  "sentence-transformers>=3.0",
+  "rank-bm25>=0.2.2",
+  "faiss-cpu>=1.8",
+  "pydantic>=2.7",
+  "numpy>=1.26",
+  "tiktoken>=0.7",
+  "python-dotenv>=1.0",
+  "tenacity>=8.2",
+  "pyyaml>=6.0",
+  "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.5"]
+dashboard = ["jinja2>=3.1", "plotly>=5.20"]
+app = ["gradio>=4.40"]
+observability = ["langfuse>=2.40"]
+
+[project.scripts]
+rag-eval = "rag_evals.eval.run:cli"
+rag-ingest = "rag_evals.ingest:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

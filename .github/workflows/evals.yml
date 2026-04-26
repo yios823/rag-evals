@@ -1,0 +1,69 @@
+name: evals
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: pytest
+
+  retrieval-evals:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev,dashboard]"
+      - name: Build index from sample corpus
+        run: python -m rag_evals.ingest --corpus data/corpus --out data/index
+      - name: Run eval suite (mock generator; retrieval-only metrics gated)
+        run: python -m rag_evals.eval.run --golden data/golden.jsonl --out data/results.json --mock
+      - name: Render dashboard
+        run: python dashboards/render.py --results data/results.json --out dashboards/build
+      - name: Upload results.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: data/results.json
+      - name: Upload dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard
+          path: dashboards/build
+
+  publish-dashboard:
+    runs-on: ubuntu-latest
+    needs: retrieval-evals
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dashboard
+          path: ./_site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+      - id: deploy
+        uses: actions/deploy-pages@v4
