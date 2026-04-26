@@ -1,9 +1,18 @@
-# Minimum acceptable scores for the CI gate. A PR that drops below any of these can't merge.
-# Tune these based on the size and difficulty of your golden set.
+# Minimum acceptable scores for the CI gate. A PR that drops below
+# any of these can't merge.
+#
+# These are tuned for the sample corpus shipped in data/corpus/ (5
+# short markdown docs). When you swap in a real corpus, raise the
+# precision and faithfulness floors — anything below 0.50 on a real
+# RAG system is a smell.
+#
+# Note on ctx_precision@5: with a 5-doc corpus and one expected doc
+# per query, max precision is 1/5 = 0.20. That's a corpus-size
+# ceiling, not a system quality measure.
 
 recall@5: 0.70
 mrr@10: 0.55
-ctx_precision@5: 0.40
+ctx_precision@5: 0.15
 faithfulness: 0.60
 refusal_correct: 0.80
 # hallucination_rate is a maximum, not a minimum.
